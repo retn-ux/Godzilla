@@ -52,20 +52,20 @@ include_directories(.)
 
 aux_source_directory(./ GODZILLA_ROOT_DIR)
 aux_source_directory(./gbase GODZILLA_BASE_DIR)
-aux_source_directory(./memory GODZILLA_MEMORY_DIR)
-aux_source_directory(./process GODZILLA_PROCESS_DIR)
-aux_source_directory(./common GODZILLA_COMMON_DIR)
-aux_source_directory(./file/dexfile GODZILLA_FILE_DEXFILE_DIR)
+#aux_source_directory(./memory GODZILLA_MEMORY_DIR)
+#aux_source_directory(./process GODZILLA_PROCESS_DIR)
+#aux_source_directory(./common GODZILLA_COMMON_DIR)
+#aux_source_directory(./file/dexfile GODZILLA_FILE_DEXFILE_DIR)
 
 add_library(
     ${PROJECT_NAME}
     STATIC
     ${GODZILLA_ROOT_DIR}
     ${GODZILLA_BASE_DIR}
-    ${GODZILLA_MEMORY_DIR}
-    ${GODZILLA_PROCESS_DIR}
-    ${GODZILLA_FILE_DEXFILE_DIR}
-    ${GODZILLA_COMMON_DIR}
+#    ${GODZILLA_MEMORY_DIR}
+#    ${GODZILLA_PROCESS_DIR}
+#    ${GODZILLA_FILE_DEXFILE_DIR}
+#    ${GODZILLA_COMMON_DIR}
 )
 
 foreach(file IN LISTS INSTALL_FILE_LIST)
