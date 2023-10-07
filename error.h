@@ -1,5 +1,5 @@
-#ifndef _GODZILLA_GERROR_H_
-#define _GODZILLA_GERROR_H_
+#ifndef _GODZILLA_ERROR_H_
+#define _GODZILLA_ERROR_H_
 
 #include "config.h"
 

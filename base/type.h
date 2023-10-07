@@ -5,6 +5,7 @@
 #include <string>
 
 #include "config.h"
+#include "ghandle.h"
 
 
 #ifdef _WINDOWS_SYSTEM_
@@ -16,14 +17,6 @@ typedef WORD Word;
 typedef BYTE Byte;
 
 typedef DWORD pid_t;
-typedef HANDLE pins_t;
-
-#define IsProcessInsInvalied(ins)\
-	(ins == nullptr)
-
-#define INVALID_PROCESSINS nullptr
-
-#define CloseProcessIns CloseHandle
 
 #endif
 
@@ -35,14 +28,6 @@ typedef uint32_t Dword;
 typedef uint16_t Word;
 typedef uint8_t Byte;
 
-#define IsProcessInsInvalied(ins)\
-	(ins == 0)
-
-#define INVALID_PROCESSINS 0
-
-#define CloseProcessIns(ins)
-
-typedef pid_t pins_t;
 #endif
 
 
@@ -69,6 +54,4 @@ typedef unsigned long ulong;
 #define VoidPtrCast(value)\
 	reinterpret_cast<void*>(value)
 
-template<typename _Ty>
-using Array= std::vector<_Ty>;
 #endif

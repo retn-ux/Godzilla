@@ -1,8 +1,8 @@
-#ifndef _GODZILLA_FILE_DEXFILE_H_
-#define _GODZILLA_FILE_DEXFILE_H_
+#ifndef _GODZILLA_FILE_DEXFILE_DEXFILE_H_
+#define _GODZILLA_FILE_DEXFILE_DEXFILE_H_
 
 #include "godzilla.h"
-#include "common/interface.h"
+#include "interface/irwriter.h"
 
 #define KSHAlDIGESTLEN 20
 
@@ -116,13 +116,9 @@ struct LEB128Byte {
 
 struct DexMapList {
 	Dword  size;               /* #of entries in list */
-	DexMapItem* list;     /* entries */
+	DexMapItem list[1];     /* entries */
 };
 
-struct DexString {
-	int length;
-	char* str;
-};
 
 struct DexTypeId {
 	Dword descriptor_idx;  // index into string_ids
@@ -140,7 +136,7 @@ struct DexTypeItem{
 
 struct DexTypeList {
 	Dword size;
-	DexTypeItem* list;
+	DexTypeItem list[1];
 };
 
 struct DexFieldId {
@@ -206,7 +202,11 @@ struct DexCode {
 	/* followed by catch_handler_item[handlersSize] */
 };
 
-
+//
+// @brief:获取DexMapItem
+// @param header:Dex文件头
+// @return:如果为Dex文件返回true
+//
 bool IsDexFile(const DexHeader* header);
 
 GErrCode GetDexHeader(
@@ -224,113 +224,5 @@ public:
 private:
 	DexHeader header_;
 };
-
-
-//需要手动释放
-GErrCode CreateDexMapList(
-	IReader& reader,
-	Gauge baseAddr,
-	const DexHeader& dexhdr,
-	DexMapList* maplist
-);
-
-GErrCode CreateDexStringId(
-	IReader& reader,
-	Gauge baseAddr,
-	const DexHeader& dexhdr,
-	DexStringId** stringId,
-	Dword* ret_size
-);
-
-void ReleaseDexStringId(
-	DexStringId* strid_list
-);
-
-void ReleaseDexMapList(
-	DexMapList* maplist
-);
-
-DexMapItem* FindDexMapItem(
-	const DexMapList* maplist,
-	MapItemType type
-);
-
-void ParseLEB128Byte(Byte value, LEB128Byte* lebByte);
-
-//0号位为最高位
-int GetValueOfLEB128(Byte* data, size_t size, size_t* byteSize);
-
-GErrCode CreateDexString(
-	IReader& reader,
-	Gauge baseAddr,
-	const DexStringId& dexStrId,
-	DexString* dexstr
-);
-
-void ReleaseDexString(DexString* str);
-
-GErrCode CreateDexTypeId(
-	IReader& reader,
-	Gauge baseAddr,
-	const DexHeader& dexhdr,
-	DexTypeId** typeId,
-	Dword* ret_size
-);
-
-void ReleaseDexTypeId(DexTypeId* typeids);
-
-
-GErrCode CreateDexTypeList(
-	IReader& reader,
-	Gauge baseAddr,
-	const DexProtoId& protoId,
-	DexTypeList* typeList
-);
-
-void ReleaseTypeList(DexTypeList* typelist);
-
-GErrCode CreateDexProtoId(
-	IReader& reader,
-	Gauge baseAddr,
-	const DexHeader& dexhdr,
-	DexProtoId** protoId,
-	Dword* ret_size
-);
-
-void ReleaseDexProtoId(DexProtoId* protoIds);
-
-GErrCode CreateDexFieldId(
-	IReader& reader,
-	Gauge baseAddr,
-	const DexHeader& header,
-	DexFieldId** fieldIds,
-	Dword* ret_size
-);
-
-void ReleaseDexFieldId(DexFieldId* fieldIds);
-
-
-GErrCode CreateDexMethodId(
-	IReader& reader,
-	Gauge baseAddr,
-	const DexHeader& header,
-	DexMethodId** methodIds,
-	Dword* ret_size
-);
-
-void ReleaseDexMethodId(DexMethodId* methodIds);
-
-
-GErrCode CreateDexClassDef(
-	IReader& reader,
-	Gauge baseAddr,
-	const DexHeader& header,
-	DexClassDef** classDefs,
-	Dword* retSize
-);
-
-void ReleaseDexClassDef(DexClassDef* classDefs);
-
-
 
 #endif
