@@ -54,8 +54,10 @@ aux_source_directory(./ GODZILLA_ROOT_DIR)
 aux_source_directory(./gbase GODZILLA_BASE_DIR)
 #aux_source_directory(./memory GODZILLA_MEMORY_DIR)
 #aux_source_directory(./process GODZILLA_PROCESS_DIR)
-#aux_source_directory(./common GODZILLA_COMMON_DIR)
-#aux_source_directory(./file/dexfile GODZILLA_FILE_DEXFILE_DIR)
+aux_source_directory(./common GODZILLA_COMMON_DIR)
+#aux_source_directory(./system GODZILLA_SYSTEM_DIR)
+
+aux_source_directory(./file/dexfile GODZILLA_FILE_DEXFILE_DIR)
 
 add_library(
     ${PROJECT_NAME}
@@ -64,10 +66,34 @@ add_library(
     ${GODZILLA_BASE_DIR}
 #    ${GODZILLA_MEMORY_DIR}
 #    ${GODZILLA_PROCESS_DIR}
-#    ${GODZILLA_FILE_DEXFILE_DIR}
-#    ${GODZILLA_COMMON_DIR}
+    ${GODZILLA_FILE_DEXFILE_DIR}
+    ${GODZILLA_COMMON_DIR}
+#    ${GODZILLA_SYSTEM_DIR}
 )
 
-foreach(file IN LISTS INSTALL_FILE_LIST)
-    install(COPY ${file} DESTINATION ${CMAKE_BINARY_DIR})
+# 指定要递归查找头文件的目录
+set(HEADER_DIR "${CMAKE_SOURCE_DIR}")
+
+# 使用 file(GLOB_RECURSE ...) 命令递归查找头文件
+file(GLOB_RECURSE HEADER_FILES "${HEADER_DIR}/*.h")
+
+# 创建一个列表来存储相对路径
+set(RELATIVE_HEADER_FILES "")
+
+# 遍历找到的头文件并获取相对路径
+foreach(HEADER ${HEADER_FILES})
+    file(RELATIVE_PATH RELATIVE_PATH_HEADER "${HEADER_DIR}" "${HEADER}")
+    list(APPEND RELATIVE_HEADER_FILES "${RELATIVE_PATH_HEADER}")
 endforeach()
+
+# 指定 Godzilla 目录
+set(GODZILLA_DIR "${CMAKE_BINARY_DIR}/godzilla")
+
+# 复制头文件到 Godzilla 目录
+foreach(RELATIVE_HEADER ${RELATIVE_HEADER_FILES})
+    configure_file("${HEADER_DIR}/${RELATIVE_HEADER}" "${GODZILLA_DIR}/${RELATIVE_HEADER}" COPYONLY)
+endforeach()
+
+
+
+
