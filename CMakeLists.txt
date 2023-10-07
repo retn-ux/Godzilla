@@ -71,25 +71,25 @@ add_library(
 #    ${GODZILLA_SYSTEM_DIR}
 )
 
-# ָ��Ҫ�ݹ����ͷ�ļ���Ŀ¼
+# 指定要递归查找头文件的目录
 set(HEADER_DIR "${CMAKE_SOURCE_DIR}")
 
-# ʹ�� file(GLOB_RECURSE ...) ����ݹ����ͷ�ļ�
+# 使用 file(GLOB_RECURSE ...) 命令递归查找头文件
 file(GLOB_RECURSE HEADER_FILES "${HEADER_DIR}/*.h")
 
-# ����һ���б����洢���·��
+# 创建一个列表来存储相对路径
 set(RELATIVE_HEADER_FILES "")
 
-# �����ҵ���ͷ�ļ�����ȡ���·��
+# 遍历找到的头文件并获取相对路径
 foreach(HEADER ${HEADER_FILES})
     file(RELATIVE_PATH RELATIVE_PATH_HEADER "${HEADER_DIR}" "${HEADER}")
     list(APPEND RELATIVE_HEADER_FILES "${RELATIVE_PATH_HEADER}")
 endforeach()
 
-# ָ�� Godzilla Ŀ¼
+# 指定 Godzilla 目录
 set(GODZILLA_DIR "${CMAKE_BINARY_DIR}/godzilla")
 
-# ����ͷ�ļ��� Godzilla Ŀ¼
+# 复制头文件到 Godzilla 目录
 foreach(RELATIVE_HEADER ${RELATIVE_HEADER_FILES})
     configure_file("${HEADER_DIR}/${RELATIVE_HEADER}" "${GODZILLA_DIR}/${RELATIVE_HEADER}" COPYONLY)
 endforeach()
