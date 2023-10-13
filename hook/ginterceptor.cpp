@@ -239,19 +239,19 @@ GErrCode GInterceptor::CreateFuncHook(
 		chunk.orginalCode
 	);
 	if (code.empty())return GErrCode::UnknownError;
-	size_t read_size = 0;
+	size_t write_size = 0;
 	ec = memory.Write(
 		byteCodeAddr,
 		code.data(),
 		code.size(),
-		&read_size
+		&write_size
 	);
 	if (ec != GErrCode::NoError) {
 		memory.Free(byteCodeAddr);
 		return ec;
 	}
 
-	if (read_size != code.size()) {
+	if (write_size != code.size()) {
 		memory.Free(byteCodeAddr);
 		return GErrCode::UnknownError;
 	}
