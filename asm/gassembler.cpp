@@ -48,17 +48,20 @@ std::vector<Byte> GAssembler::GetAsmCode(
 	size_t success_count = 0;
 	if (ks_asm(
 		engine_,
-		opcode.data(),
+		opcode.c_str(),
 		baseAddress,
 		&byte_data,
 		&size,
 		&success_count
 	) == 0)
 	{
-		result.resize(size);
-		memcpy(result.data(), byte_data, size);
-		ks_free(byte_data);
-
+		
+		if (success_count > 0) {
+			result.resize(size);
+			memcpy(result.data(), byte_data, size);
+			ks_free(byte_data);
+		}
+		
 		return std::move(result);
 	}
 	return result;

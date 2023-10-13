@@ -49,12 +49,13 @@ include_directories(${capstone_STATIC_INCLUDE_DIRS})
 include_directories(${keystone_STATIC_INCLUDE_DIRS})
 
 aux_source_directory(./ GODZILLA_ROOT_DIR)
+aux_source_directory(./asm GODZILLA_ASM_DIR)
 aux_source_directory(./gbase GODZILLA_BASE_DIR)
 aux_source_directory(./memory GODZILLA_MEMORY_DIR)
 aux_source_directory(./process GODZILLA_PROCESS_DIR)
 aux_source_directory(./common GODZILLA_COMMON_DIR)
 aux_source_directory(./system GODZILLA_SYSTEM_DIR)
-aux_source_directory(./asm GODZILLA_ASM_DIR)
+aux_source_directory(./hook GODZILLA_HOOK_DIR)
 aux_source_directory(./file/dexfile GODZILLA_FILE_DEXFILE_DIR)
 
 add_library(
@@ -68,6 +69,7 @@ add_library(
     ${GODZILLA_COMMON_DIR}
     ${GODZILLA_SYSTEM_DIR}
     ${GODZILLA_ASM_DIR}
+    ${GODZILLA_HOOK_DIR}
 )
 target_link_libraries(
     ${PROJECT_NAME}
