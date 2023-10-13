@@ -1,5 +1,14 @@
 #include "gprocmemory.h"
 
+bool GProcMemory::IsHavePageType(
+	const PageType& type,
+	const PageType& have_type
+) {
+#ifdef _WINDOWS_SYSTEM_
+	return static_cast<DWORD>(type) & static_cast<DWORD>(have_type);
+#endif
+}
+
 GProcMemory::GProcMemory():hd_() {}
 
 GProcMemory::GProcMemory(const GHandle& hd):hd_(hd) {}
@@ -48,8 +57,6 @@ GErrCode GProcMemory::Write(
 	if (addr == 0 || hd_.IsInvalid())
 		return GErrCode::InvalidParameter;
 #ifdef _WINDOWS_SYSTEM_
-	SIZE_T ws = 0;
-
 	if (!WriteProcessMemory(
 		hd_.GetElement(),
 		VoidPtrCast(addr),
@@ -58,8 +65,6 @@ GErrCode GProcMemory::Write(
 		numberOfBytesWritten)
 	)
 		return GErrCode::UnknownError;
-
-	if (ws != size)return GErrCode::UnknownError;
 #endif
 	return GErrCode::NoError;
 }
@@ -84,13 +89,13 @@ Gauge GProcMemory::Alloc(
 }
 
 
-bool GProcMemory::Free(pins_t ins, Gauge address) {
+bool GProcMemory::Free(Gauge address) {
 	if (address == 0 || hd_.IsInvalid())
 		return false;
 
 #ifdef _WINDOWS_SYSTEM_
 	if (!VirtualFreeEx(
-		ins,
+		hd_.GetElement(),
 		VoidPtrCast(address),
 		0,
 		MEM_RELEASE
@@ -100,6 +105,26 @@ bool GProcMemory::Free(pins_t ins, Gauge address) {
 	return true;
 }
 
+bool GProcMemory::GetPageType(
+	Gauge address,
+	 GProcMemory::PageType* type
+) {
+#ifdef _WINDOWS_SYSTEM_
+	MEMORY_BASIC_INFORMATION memoryBaseInfo;
+	if (!VirtualQueryEx(
+		hd_.GetElement(),
+		VoidPtrCast(address),
+		&memoryBaseInfo,
+		sizeof(memoryBaseInfo)
+		
+		)) 
+	{
+		return false;
+	}
+	*type = static_cast<PageType>(memoryBaseInfo.Protect);
+#endif
+	return true;
+}
 
 bool GProcMemory::ChangePageType(
 	Gauge address,

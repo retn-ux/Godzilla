@@ -49,7 +49,7 @@ public:
 	}
 };
 
-class GDisassembler :public IDisassmebler {
+class GDisassembler :public IDisassembler {
 	using Engine = csh;
 	static const Engine InvalidEngine;
 public:
