@@ -109,6 +109,7 @@ bool GProcMemory::GetPageType(
 	Gauge address,
 	 GProcMemory::PageType* type
 ) {
+	if(address==0)return GErrCode::InvalidParameter
 #ifdef _WINDOWS_SYSTEM_
 	MEMORY_BASIC_INFORMATION memoryBaseInfo;
 	if (!VirtualQueryEx(
@@ -124,6 +125,26 @@ bool GProcMemory::GetPageType(
 	*type = static_cast<PageType>(memoryBaseInfo.Protect);
 #endif
 	return true;
+}
+
+Gauge GProcMemory::GetBaseAddress(Gauge addr) {
+	if (addr == 0)return 0;
+	Gauge baseAddress = 0;
+#ifdef _WINDOWS_SYSTEM_
+	MEMORY_BASIC_INFORMATION memoryBaseInfo;
+	if (!VirtualQueryEx(
+		hd_.GetElement(),
+		VoidPtrCast(addr),
+		&memoryBaseInfo,
+		sizeof(memoryBaseInfo)
+
+	))
+	{
+		return 0;
+	}
+	baseAddress = GaugeCast(memoryBaseInfo.AllocationBase);
+#endif
+	return baseAddress;
 }
 
 bool GProcMemory::ChangePageType(
