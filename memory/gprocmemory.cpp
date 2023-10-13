@@ -109,7 +109,7 @@ bool GProcMemory::GetPageType(
 	Gauge address,
 	 GProcMemory::PageType* type
 ) {
-	if(address==0)return GErrCode::InvalidParameter
+	if (address == 0)return GErrCode::InvalidParameter;
 #ifdef _WINDOWS_SYSTEM_
 	MEMORY_BASIC_INFORMATION memoryBaseInfo;
 	if (!VirtualQueryEx(
