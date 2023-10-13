@@ -49,6 +49,8 @@ public:
 		PageType type
 	);
 
+	Gauge GetBaseAddress(Gauge addr);
+
 	bool Free(Gauge address);
 
 	bool GetPageType(
