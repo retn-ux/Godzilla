@@ -15,6 +15,11 @@ public:
 		ReadExecute = PAGE_EXECUTE_READ,
 #endif
 	};
+
+	static bool IsHavePageType(
+		const PageType& type,
+		const PageType& have_type
+	);
 public:
 	GProcMemory();
 	GProcMemory(const GHandle& hd);
@@ -44,7 +49,12 @@ public:
 		PageType type
 	);
 
-	bool Free(pins_t ins, Gauge address);
+	bool Free(Gauge address);
+
+	bool GetPageType(
+		Gauge address,
+		PageType* type
+	);
 
 	bool ChangePageType(
 		Gauge address,
