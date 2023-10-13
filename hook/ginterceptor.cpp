@@ -23,10 +23,10 @@ std::vector<Byte> GJmpEaxSpringboard::GetSpringboardCode(
 	Gauge addr
 ) {
 #ifdef _ARCH_X86_
-	std::string codestr = "mov eax,0x" + ConvertToHexStr(addr) + "\ncall eax";
+	std::string codestr = "mov eax,0x" + ConvertToHexStr(addr) + "\njmp eax";
 #endif
 #ifdef _ARCH_64_
-	std::string codestr = "mov rax,0x" + ConvertToHexStr(addr) + "\ncall rax";
+	std::string codestr = "mov rax,0x" + ConvertToHexStr(addr) + "\njmp rax";
 #endif
 	return std::move(assembler.GetAsmCode(0, codestr));
 }
