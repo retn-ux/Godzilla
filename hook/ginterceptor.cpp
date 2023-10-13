@@ -23,10 +23,10 @@ std::vector<Byte> GJmpEaxSpringboard::GetSpringboardCode(
 	Gauge addr
 ) {
 #ifdef _ARCH_X86_
-	std::string codestr = "mov eax,0x" + ConvertToHexStr(addr) + "\ncall eax";
+	std::string codestr = "mov eax,0x" + ConvertToHexStr(addr) + "\njmp eax";
 #endif
 #ifdef _ARCH_64_
-	std::string codestr = "mov rax,0x" + ConvertToHexStr(addr) + "\ncall rax";
+	std::string codestr = "mov rax,0x" + ConvertToHexStr(addr) + "\njmp rax";
 #endif
 	return std::move(assembler.GetAsmCode(0, codestr));
 }
@@ -239,19 +239,19 @@ GErrCode GInterceptor::CreateFuncHook(
 		chunk.orginalCode
 	);
 	if (code.empty())return GErrCode::UnknownError;
-	size_t read_size = 0;
+	size_t write_size = 0;
 	ec = memory.Write(
 		byteCodeAddr,
 		code.data(),
 		code.size(),
-		&read_size
+		&write_size
 	);
 	if (ec != GErrCode::NoError) {
 		memory.Free(byteCodeAddr);
 		return ec;
 	}
 
-	if (read_size != code.size()) {
+	if (write_size != code.size()) {
 		memory.Free(byteCodeAddr);
 		return GErrCode::UnknownError;
 	}
