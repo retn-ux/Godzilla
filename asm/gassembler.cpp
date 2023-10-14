@@ -61,7 +61,6 @@ std::vector<Byte> GAssembler::GetAsmCode(
 			memcpy(result.data(), byte_data, size);
 			ks_free(byte_data);
 		}
-		
 		return std::move(result);
 	}
 	return result;
