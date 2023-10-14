@@ -41,7 +41,7 @@ GErrCode GProcMemory::Read(
 		VoidPtrCast(off),
 		buffer,
 		size,
-		numberOfBytesRead)
+		(SIZE_T*)numberOfBytesRead)
 		)
 		return GErrCode::UnknownError;
 #endif
@@ -62,7 +62,7 @@ GErrCode GProcMemory::Write(
 		VoidPtrCast(addr),
 		buffer,
 		size,
-		numberOfBytesWritten)
+		(SIZE_T*)numberOfBytesWritten)
 	)
 		return GErrCode::UnknownError;
 #endif

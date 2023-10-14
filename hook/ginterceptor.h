@@ -8,7 +8,7 @@
 #include "memory/gprocmemory.h"
 #include "interface/iasmengine.h"
 
-typedef void (__stdcall *DetourFuncPtr)(Gauge esp, Gauge ebp);
+typedef void (*DetourFuncPtr)(Gauge esp, Gauge ebp);
 
 class ISpringboard {
 public:

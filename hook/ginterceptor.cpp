@@ -12,8 +12,30 @@ std::vector<Byte> GPushRetSpringboard::GetSpringboardCode(
 	IAssembler& engine,
 	Gauge addr
 ) {
-	std::string codestr = "push 0x" + ConvertToHexStr(addr)+"\nret";
-	return std::move(engine.GetAsmCode(0, codestr));
+	std::vector<Byte> result;
+	result.push_back(0x68);
+#ifdef _ARCH_86_
+
+	Byte* tmp = (Byte*)&addr;
+	for (int i = 0; i < 4; i++) {
+		result.push_back(tmp[i]);
+	}
+#endif
+#ifdef _ARCH_64_
+	Byte* tmp = (Byte*)&addr;
+	for (int i = 0; i < 4; i++) {
+		result.push_back(tmp[i]);
+	}
+	result.push_back(0xc7);
+	result.push_back(0x44);
+	result.push_back(0x24);
+	result.push_back(0x04);
+	for (int i = 4; i < 8; i++) {
+		result.push_back(tmp[i]);
+	}
+#endif
+	result.push_back(0xc3);
+	return std::move(result);
 }
 
 GJmpEaxSpringboard::GJmpEaxSpringboard() {}
@@ -22,7 +44,7 @@ std::vector<Byte> GJmpEaxSpringboard::GetSpringboardCode(
 	IAssembler& assembler,
 	Gauge addr
 ) {
-#ifdef _ARCH_X86_
+#ifdef _ARCH_86_
 	std::string codestr = "mov eax,0x" + ConvertToHexStr(addr) + "\njmp eax";
 #endif
 #ifdef _ARCH_64_
@@ -82,10 +104,19 @@ GErrCode GInterceptor::CreateBaseHook(
 		springboard_code.size()
 	);
 	if (except_size == 0)return GErrCode::DisasmError;
-	chunk->orginalCode.erase(
-		chunk->orginalCode.begin()+except_size,
-		chunk->orginalCode.end()
+	
+	if (except_size > springboard_code.size()) {
+		chunk->orginalCode.erase(
+			chunk->orginalCode.begin() + except_size,
+			chunk->orginalCode.end()
 		);
+		size_t diff = except_size - springboard_code.size();
+		for (size_t i = 0; i < diff; i++) {
+			springboard_code.push_back(0x90);
+		}
+			
+	}
+	
 	
 	size_t write_size = 0;
 	ec = memory.Write(
@@ -219,6 +250,7 @@ GErrCode GInterceptor::CreateFuncHook(
 	chunk.detourSize = ByteCodeSize;
 	auto sbcode = 
 		springboard.GetSpringboardCode(engine, byteCodeAddr);
+	auto tmp_list = engine.GetDisasmCode(byteCodeAddr, sbcode);
 	GErrCode ec = CreateBaseHook(
 		memory,
 		engine,
@@ -283,13 +315,14 @@ std::vector<Byte> GetDetourCode(
 #ifdef _ARCH_86_
 	opcode += "pushfd\n";
 	opcode += "pushad\n";
-	opcode += "push esp";
-	opcode += "push ebp";
+	opcode += "push esp\n";
+	opcode += "push ebp\n";
+	opcode += "mov ebp,esp\n";
 	opcode += "mov eax,0x";
 	opcode += ConvertToHexStr(func_addr);
 	opcode += "\ncall eax\n";
-	opcode += "pop ebp";
-	opcode += "pop esp";
+	opcode += "pop ebp\n";
+	opcode += "pop esp\n";
 	opcode += "popad\n";
 	opcode += "popfd\n";
 #endif
@@ -313,10 +346,11 @@ std::vector<Byte> GetDetourCode(
 	opcode += "push r15\n";
 	opcode += "mov rcx,rsp\n";
 	opcode += "mov rdx,rbp\n";
+	opcode += "sub rsp,0x20\n";
 	opcode += "mov rax,0x";
 	opcode += ConvertToHexStr(func_addr);
 	opcode += "\ncall rax\n";
-
+	opcode += "add rsp,0x20";
 	opcode += "pop r15\n";
 	opcode += "pop r14\n";
 	opcode += "pop r13\n";
@@ -338,14 +372,35 @@ std::vector<Byte> GetDetourCode(
 	auto opstr_list = 
 		engine.GetDisasmCode(hooked_addr, byte_code);
 	for (auto& it : opstr_list) {
+		if (it == "int3")
+			it = "nop";
 		opcode += it;
 		opcode += "\n";
 	}
-
-	opcode += "mov rax,0x";
-	opcode += ConvertToHexStr(hooked_addr + byte_code.size());
-	opcode += "\npush rax\n";
-	opcode += "ret";
 	auto result = engine.GetAsmCode(detourcode_addr, opcode);
+
+	Gauge tmpAddr = hooked_addr + byte_code.size();
+	result.push_back(0x68);
+#ifdef _ARCH_86_
+
+	Byte* tmp = (Byte*)&tmpAddr;
+	for (int i = 0; i < 4; i++) {
+		result.push_back(tmp[i]);
+	}
+#endif
+#ifdef _ARCH_64_
+	Byte* tmp = (Byte*)&tmpAddr;
+	for (int i = 0; i < 4; i++) {
+		result.push_back(tmp[i]);
+	}
+	result.push_back(0xc7);
+	result.push_back(0x44);
+	result.push_back(0x24);
+	result.push_back(0x04);
+	for (int i = 4; i < 8; i++) {
+		result.push_back(tmp[i]);
+	}
+#endif
+	result.push_back(0xc3);
 	return result;
 }
